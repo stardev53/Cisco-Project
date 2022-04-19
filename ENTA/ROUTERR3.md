@@ -41,22 +41,23 @@ access-list 2 permit 192.168.0.0 0.0.255.255
 
 ```
 router eigrp 100
- no auto-summary
- redistribute static
  network 10.0.15.0 0.0.0.255
  network 10.1.15.0 0.0.0.255
  network 10.2.15.0 0.0.0.255
  network 192.168.15.0 0.0.0.3
+ redistribute static
+ redistribute eigrp 200
  passive-interface GigabitEthernet0/0
  passive-interface GigabitEthernet0/1
- 
- router eigrp 200
- no auto-summary
- redistribute static
+
+
+router eigrp 200
  network 10.0.15.0 0.0.0.255
  network 10.1.15.0 0.0.0.255
  network 10.2.15.0 0.0.0.255
  network 192.168.15.4 0.0.0.3
+ redistribute static
+ redistribute eigrp 100
  passive-interface GigabitEthernet0/0
  passive-interface GigabitEthernet0/1
 ```
@@ -114,7 +115,7 @@ crypto ipsec transform-set TRANS ah-sha-hmac esp-aes 256 esp-sha-hmac
 crypto map OMAPA 10 ipsec-isakmp 
  set peer 1.15.0.2
  set transform-set TRANS 
- match address 100
+ match address 101
 
 interface Tunnel100
  ip address 192.168.15.1 255.255.255.252
@@ -126,7 +127,7 @@ interface Serial0/0/0
  ip nat outside
  crypto map OMAPA
 
-access-list 100 permit gre host 1.15.0.1 host 1.15.0.2
+access-list 101 permit gre host 1.15.0.1 host 1.15.0.2
  ```
  『 Tunnel 200 - ENTA TO BETA 』
  ```
@@ -136,8 +137,8 @@ mode tunnel
 
 crypto map MAPA 10 ipsec-isakmp 
  set peer 2.15.0.2
- set transform-set TRANS2
- match address 101
+ set transform-set TRANS2 
+ match address 100
 
 interface Tunnel200
  ip address 192.168.15.5 255.255.255.252
@@ -149,7 +150,7 @@ interface Serial0/0/1
  ip nat outside
  crypto map MAPA
 
-access-list 101 permit gre host 2.15.0.1 host 2.15.0.2
+access-list 100 permit gre host 2.15.0.1 host 2.15.0.2
  ```
 
  
